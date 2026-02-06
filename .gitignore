@@ -3,23 +3,23 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Environnements
-.env
+# Environnements virtuels
 .venv/
 venv/
+.env
 
-# Données et images (ne jamais versionner)
+# Données et images (ne pas versionner)
 data/
 *.csv
 *.json
 *.jpg
 *.png
 
-# macOS / Windows
+# Fichiers système
 .DS_Store
 */.DS_Store
 Thumbs.db
 
-# IDE / éditeurs
+# Répertoires d'IDE/éditeurs
 .vscode/
 .idea/
