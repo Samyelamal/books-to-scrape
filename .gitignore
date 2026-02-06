@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environnements
+.env
+.venv/
+venv/
+
+# Données et images (ne jamais versionner)
+data/
+*.csv
+*.json
+*.jpg
+*.png
+
+# macOS / Windows
+.DS_Store
+*/.DS_Store
+Thumbs.db
+
+# IDE / éditeurs
+.vscode/
+.idea/
