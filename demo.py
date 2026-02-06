@@ -22,7 +22,8 @@ def main():
         cfg = json.load(f)
 
     base = cfg["url_base"]
-    timeout = cfg["timeout"]
+    timeout = cfg.get("timeout", 10)
+    note_format = cfg.get("note_format", "all")
 
     # Accueil
     html_index = telecharger_page(urljoin(base, "index.html"), timeout=timeout)
@@ -36,13 +37,13 @@ def main():
     cat_html = telecharger_page(url_cat, timeout=timeout)
 
     # Livres de cette page uniquement
-    livres = extraire_livres(cat_html, base, nom_cat)
+    livres = extraire_livres(cat_html, base, nom_cat, timeout=timeout)
 
     # Dossier catégorie
     dossier_cat = os.path.join("data", nom_cat)
     chemin_csv = os.path.join(dossier_cat, "books.csv")
 
-    # Sauvegarde CSV
+    # Sauvegarde CSV (format de note configurable)
     enregistrer_csv(livres, chemin_csv)
 
     # Télécharger toutes les images (avec barre de progression)

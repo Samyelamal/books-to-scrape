@@ -44,6 +44,7 @@ def main():
 
     base = cfg["url_base"]
     timeout = cfg.get("timeout", 10)
+    note_format = cfg.get("note_format", "all")
 
     # Page d'accueil et catégories
     index_html = telecharger_page(urljoin(base, "index.html"), timeout=timeout)
@@ -60,7 +61,7 @@ def main():
         tous_les_livres = []
         for p_url in pages:
             page_html = telecharger_page(p_url, timeout=timeout)
-            livres = extraire_livres(page_html, base, nom_cat)
+            livres = extraire_livres(page_html, base, nom_cat, timeout=timeout)
             tous_les_livres.extend(livres)
 
         # Sauvegarde CSV
