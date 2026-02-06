@@ -2,12 +2,13 @@
 Démo rapide :
 - Récupère la 1re catégorie.
 - Sauvegarde un CSV.
-- Télécharge 2-3 images.
+- Télécharge les images.
 """
 
 import json
 import os
 from urllib.parse import urljoin
+from tqdm import tqdm
 
 from src.telechargement import telecharger_page
 from src.categorie import extraire_categories
@@ -44,8 +45,8 @@ def main():
     # Sauvegarde CSV
     enregistrer_csv(livres, chemin_csv)
 
-    # Télécharger 3 images
-    for i, livre in enumerate(livres[:3], start=1):
+    # Télécharger toutes les images (avec barre de progression)
+    for i, livre in enumerate(tqdm(livres, desc=f"Téléchargement images ({nom_cat})"), start=1):
         enregistrer_image(livre.url_image, dossier_cat, f"book_{i}.jpg")
 
     print(f"Démo OK : {len(livres)} livres trouvés dans '{nom_cat}'.")

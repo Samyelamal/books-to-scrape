@@ -14,6 +14,7 @@ from src.telechargement import telecharger_page
 from src.categorie import extraire_categories
 from src.livre import extraire_livres
 from src.enregistrement import enregistrer_csv, enregistrer_image
+from tqdm import tqdm
 
 
 def lister_pages_categorie(url_categorie, timeout):
@@ -67,8 +68,8 @@ def main():
         chemin_csv = os.path.join(dossier_cat, "books.csv")
         enregistrer_csv(tous_les_livres, chemin_csv)
 
-        # Sauvegarde images
-        for i, livre in enumerate(tous_les_livres, start=1):
+        # Sauvegarde images (avec barre de progression)
+        for i, livre in enumerate(tqdm(tous_les_livres, desc=f"Téléchargement images ({nom_cat})"), start=1):
             nom_img = f"book_{i}.jpg"
             try:
                 enregistrer_image(livre.url_image, dossier_cat, nom_img)
