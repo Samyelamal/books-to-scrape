@@ -1,38 +1,25 @@
 # Books To Scrape – Scraper Python
 
-Projet 2 OPC permettant d'extraire les informations du site https://books.toscrape.com/.
+Scraper pédagogique pour extraire des informations du site public de démonstration : https://books.toscrape.com/.
 
-Ce que fait le programme :
-- Récupère toutes les catégories.
-- Parcourt toutes les pages de chaque catégorie.
-- Extrait les livres (titre, prix, note, stock, image, catégorie).
-- Convertit la note en étoiles (★☆☆☆☆ → ★★★★★).
-- Récupère le stock depuis la page détail.
-- Télécharge les images.
-- Génère un CSV par catégorie.
-- Affiche une barre de progression pour le téléchargement.
+## Fonctions principales
+- Récupère les **catégories**.
+- Parcourt les pages d’une catégorie (démo : 1 page / catégorie ; complet : toute la pagination).
+- Extrait : **titre**, **prix**, **stock**, **note** (convertie en **étoiles ★**), **URL image**, **catégorie**.
+- Télécharge les **images**.
+- Génère **un CSV par catégorie** dans `data/<Catégorie>/books.csv`.
+- Affiche des **barres de progression** pour les téléchargements.
 
-Technologies utilisées :
-- Python
-- Requests
-- BeautifulSoup
-- tqdm
+## Prérequis
+- **Python 3.10+**
+- Accès Internet
 
-Structure générale :
-- `demo.py` : exécution rapide (1 seule catégorie).
-- `main.py` : exécution complète (toutes les catégories).
-- `src/telechargement.py` : téléchargement HTML / images.
-- `src/categorie.py` : extraction des catégories.
-- `src/livre.py` : extraction des données livres + stock + correction des URLs.
-- `src/enregistrement.py` : création CSV et sauvegarde des images.
-- `data/` : résultats générés.
-
-Installation :
-1. Créer un environnement virtuel.
-2. Installer les dépendances.
-3. Lancer la démo ou l’exécution complète.
-
+## Installation
 ```bash
 python -m venv .venv
-source .venv/bin/activate         # Windows : .venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
+# Windows PowerShell
+# .venv\Scripts\Activate.ps1
+
 pip install -r requirements.txt
