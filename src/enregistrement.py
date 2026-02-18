@@ -51,6 +51,7 @@ def enregistrer_csv(livres, chemin_fichier: str):
             "stock",
             "url_image",
             "categorie",
+            "upc",     
         ])
 
         # Lignes
@@ -62,6 +63,7 @@ def enregistrer_csv(livres, chemin_fichier: str):
                 int(getattr(livre, "stock", 0)),
                 livre.url_image,
                 livre.categorie,
+                livre.upc, 
             ])
 
 
@@ -77,3 +79,8 @@ def enregistrer_image(url_image: str, dossier_categorie: str, nom_fichier: str):
 
     chemin_image = os.path.join(images_dir, nom_fichier)
     contenu = telecharger_binaire(url_image)
+
+    with open(chemin_image, "wb") as f:
+        f.write(contenu)
+
+    return chemin_image

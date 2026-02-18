@@ -71,7 +71,7 @@ def main():
 
         # Sauvegarde images (avec barre de progression)
         for i, livre in enumerate(tqdm(tous_les_livres, desc=f"Téléchargement images ({nom_cat})"), start=1):
-            nom_img = f"book_{i}.jpg"
+            nom_img = f"{livre.upc}.jpg" if getattr(livre, "upc", None) else f"book_{i}.jpg"
             try:
                 enregistrer_image(livre.url_image, dossier_cat, nom_img)
             except Exception as e:

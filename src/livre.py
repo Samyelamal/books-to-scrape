@@ -40,7 +40,8 @@ class Livre:
     note: int
     url_image: str
     categorie: str
-    stock: int  # AJOUT : quantité disponible
+    stock: int 
+    upc: str  
 
 
 # --------------------------------------------------------------------
@@ -85,6 +86,24 @@ def extraire_stock(html_detail: str) -> int:
     m = re.search(r"\((\d+)\s+available\)", txt)
     return int(m.group(1)) if m else 0
 
+def extraire_upc(html_detail: str) -> str:
+    """
+    Extrait le numéro UPC depuis la page détail.
+    Retourne '' si non trouvé.
+    """
+    soup = BeautifulSoup(html_detail, "lxml")
+    table = soup.find("table", class_="table table-striped")
+    if not table:
+        return ""
+
+    # L’UPC est dans la première ligne du tableau
+    first_row = table.find("tr")
+    if not first_row:
+        return ""
+
+    upc_cell = first_row.find("td")
+    return upc_cell.get_text(strip=True) if upc_cell else ""
+
 # --------------------------------------------------------------------
 # Extraction principale depuis une page catégorie
 # --------------------------------------------------------------------
@@ -122,6 +141,7 @@ def extraire_livres(html_page: str, url_base: str, nom_categorie: str, timeout: 
         try:
             html_detail = telecharger_page(url_detail, timeout=timeout)
             stock = extraire_stock(html_detail)
+            upc = extraire_upc(html_detail)  
         except Exception:
             # Fallback discret : on laisse stock=0 si erreur réseau/404
             stock = 0
@@ -135,6 +155,7 @@ def extraire_livres(html_page: str, url_base: str, nom_categorie: str, timeout: 
                 url_image=url_image,
                 categorie=nom_categorie,
                 stock=stock,
+                upc=upc,  
             )
         )
 
