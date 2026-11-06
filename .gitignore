@@ -12,6 +12,7 @@ venv/
 data/
 *.csv
 *.json
+!config.json
 *.jpg
 *.png
 

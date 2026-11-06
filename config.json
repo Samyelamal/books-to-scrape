@@ -1,0 +1,5 @@
+{
+    "url_base": "https://books.toscrape.com/",
+    "timeout": 10,
+    "demo_nb_categories": 5
+}

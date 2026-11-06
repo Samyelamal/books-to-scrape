@@ -25,7 +25,6 @@ def _note_en_etoiles(note: int) -> str:
     return "★" * n + "☆" * (5 - n)
 
 
-
 def enregistrer_csv(livres, chemin_fichier: str):
     """
     Enregistre une liste de livres dans un CSV.
@@ -37,13 +36,13 @@ def enregistrer_csv(livres, chemin_fichier: str):
     - stock (quantité disponible)
     - url_image
     - categorie
+    - upc
     """
     creer_dossier(os.path.dirname(chemin_fichier))
 
     with open(chemin_fichier, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
 
-        # En-têtes
         writer.writerow([
             "titre",
             "prix",
@@ -51,10 +50,9 @@ def enregistrer_csv(livres, chemin_fichier: str):
             "stock",
             "url_image",
             "categorie",
-            "upc",     
+            "upc",
         ])
 
-        # Lignes
         for livre in livres:
             writer.writerow([
                 livre.titre,
@@ -63,7 +61,7 @@ def enregistrer_csv(livres, chemin_fichier: str):
                 int(getattr(livre, "stock", 0)),
                 livre.url_image,
                 livre.categorie,
-                livre.upc, 
+                livre.upc,
             ])
 
 

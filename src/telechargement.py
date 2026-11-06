@@ -9,6 +9,7 @@ import requests
 
 HEADERS = {"User-Agent": "books-scraper/1.0"}
 
+
 def telecharger_page(url: str, timeout: int = 10, user_agent: Optional[str] = None) -> str:
     """
     Télécharge le HTML d'une page et retourne le texte.

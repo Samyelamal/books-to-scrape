@@ -38,15 +38,12 @@ def lister_pages_categorie(url_categorie, timeout):
 
 
 def main():
-    # Charger la configuration
     with open("config.json", "r", encoding="utf-8") as f:
         cfg = json.load(f)
 
     base = cfg["url_base"]
     timeout = cfg.get("timeout", 10)
-    note_format = cfg.get("note_format", "all")
 
-    # Page d'accueil et catégories
     index_html = telecharger_page(urljoin(base, "index.html"), timeout=timeout)
     categories = extraire_categories(index_html, base)
 
@@ -54,22 +51,18 @@ def main():
         nom_cat, url_cat = cat["nom"], cat["url"]
         print(f"\n=== Catégorie : {nom_cat} ===")
 
-        # Lister toutes les pages de la catégorie
         pages = lister_pages_categorie(url_cat, timeout)
 
-        # Extraire tous les livres de la catégorie
         tous_les_livres = []
         for p_url in pages:
             page_html = telecharger_page(p_url, timeout=timeout)
             livres = extraire_livres(page_html, base, nom_cat, timeout=timeout)
             tous_les_livres.extend(livres)
 
-        # Sauvegarde CSV
         dossier_cat = os.path.join("data", nom_cat)
         chemin_csv = os.path.join(dossier_cat, "books.csv")
         enregistrer_csv(tous_les_livres, chemin_csv)
 
-        # Sauvegarde images (avec barre de progression)
         for i, livre in enumerate(tqdm(tous_les_livres, desc=f"Téléchargement images ({nom_cat})"), start=1):
             nom_img = f"{livre.upc}.jpg" if getattr(livre, "upc", None) else f"book_{i}.jpg"
             try:

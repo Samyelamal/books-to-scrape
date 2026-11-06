@@ -7,20 +7,19 @@ Données récupérées :
 - Note (1 à 5)
 - URL de l'image
 - Catégorie
-- Stock disponible (AJOUT)
+- Stock disponible
+- UPC
 """
 
-from dataclasses import dataclass
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 import re
+from dataclasses import dataclass
+from urllib.parse import urljoin
+
+from bs4 import BeautifulSoup
 
 from src.telechargement import telecharger_page
 
 
-# --------------------------------------------------------------------
-# Conversion texte -> note
-# --------------------------------------------------------------------
 CONVERSION_NOTES = {
     "One": 1,
     "Two": 2,
@@ -30,9 +29,6 @@ CONVERSION_NOTES = {
 }
 
 
-# --------------------------------------------------------------------
-# Objet Livre
-# --------------------------------------------------------------------
 @dataclass
 class Livre:
     titre: str
@@ -40,13 +36,10 @@ class Livre:
     note: int
     url_image: str
     categorie: str
-    stock: int 
-    upc: str  
+    stock: int
+    upc: str
 
 
-# --------------------------------------------------------------------
-# Helpers internes
-# --------------------------------------------------------------------
 def _prix_vers_float(prix_str: str) -> float:
     """Convertit un prix '£51.77' en 51.77 (float)."""
     return float(prix_str.replace("Â", "").replace("£", "").strip())
@@ -74,7 +67,7 @@ def _normaliser_href_detail(href: str) -> str:
 
 def extraire_stock(html_detail: str) -> int:
     """
-    Extrait la quantité disponible depuis la page DÉTAIL.
+    Extrait la quantité disponible depuis la page détail.
     Exemple : 'In stock (22 available)' -> 22
     Retourne 0 si non trouvé.
     """
@@ -86,6 +79,7 @@ def extraire_stock(html_detail: str) -> int:
     m = re.search(r"\((\d+)\s+available\)", txt)
     return int(m.group(1)) if m else 0
 
+
 def extraire_upc(html_detail: str) -> str:
     """
     Extrait le numéro UPC depuis la page détail.
@@ -96,7 +90,7 @@ def extraire_upc(html_detail: str) -> str:
     if not table:
         return ""
 
-    # L’UPC est dans la première ligne du tableau
+    # L'UPC est dans la première ligne du tableau d'informations produit
     first_row = table.find("tr")
     if not first_row:
         return ""
@@ -104,49 +98,42 @@ def extraire_upc(html_detail: str) -> str:
     upc_cell = first_row.find("td")
     return upc_cell.get_text(strip=True) if upc_cell else ""
 
-# --------------------------------------------------------------------
-# Extraction principale depuis une page catégorie
-# --------------------------------------------------------------------
+
 def extraire_livres(html_page: str, url_base: str, nom_categorie: str, timeout: int = 10):
     """
     Extrait tous les livres d'une page catégorie.
+
+    Le stock et l'UPC ne figurent que sur la page détail de chaque livre,
+    qui est donc téléchargée en plus de la page catégorie.
     """
     soup = BeautifulSoup(html_page, "lxml")
     livres = []
 
     for produit in soup.select("article.product_pod"):
-        # --- Titre ---
         titre = produit.h3.a.get("title", "").strip()
 
-        # --- Prix ---
         prix_str = produit.select_one(".price_color").get_text(strip=True)
         prix = _prix_vers_float(prix_str)
 
-        # --- Note ---
         rating_tag = produit.select_one(".star-rating")
         classes_note = rating_tag["class"] if rating_tag and rating_tag.has_attr("class") else []
         note = _note_depuis_classes(classes_note)
 
-        # --- Image ---
-        img_rel = produit.img.get("src", "")
-        url_image = urljoin(url_base, img_rel)
+        url_image = urljoin(url_base, produit.img.get("src", ""))
 
-        # --- URL DETAIL pour récupérer le stock ---
-        url_detail_rel = produit.h3.a.get("href", "")
-        url_detail_rel = _normaliser_href_detail(url_detail_rel)
+        url_detail_rel = _normaliser_href_detail(produit.h3.a.get("href", ""))
         url_detail = urljoin(url_base, url_detail_rel)
 
-        # --- Téléchargement de la page détail + extraction du stock ---
         stock = 0
+        upc = ""
         try:
             html_detail = telecharger_page(url_detail, timeout=timeout)
             stock = extraire_stock(html_detail)
-            upc = extraire_upc(html_detail)  
+            upc = extraire_upc(html_detail)
         except Exception:
-            # Fallback discret : on laisse stock=0 si erreur réseau/404
-            stock = 0
+            # Une page détail inaccessible ne doit pas interrompre toute la catégorie
+            pass
 
-        # --- Ajout du livre complet ---
         livres.append(
             Livre(
                 titre=titre,
@@ -155,7 +142,7 @@ def extraire_livres(html_page: str, url_base: str, nom_categorie: str, timeout: 
                 url_image=url_image,
                 categorie=nom_categorie,
                 stock=stock,
-                upc=upc,  
+                upc=upc,
             )
         )
 
